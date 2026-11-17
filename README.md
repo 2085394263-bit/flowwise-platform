@@ -1,8 +1,6 @@
 # FlowWise 项目协作平台
 
-[![Build](https://github.com/OWNER/REPOSITORY/actions/workflows/build.yml/badge.svg)](https://github.com/OWNER/REPOSITORY/actions/workflows/build.yml)
-
-> GitHub 发布前，请将徽章中的 `OWNER/REPOSITORY` 替换为实际仓库地址。
+[![Build](https://github.com/2085394263-bit/flowwise-platform/actions/workflows/build.yml/badge.svg)](https://github.com/2085394263-bit/flowwise-platform/actions/workflows/build.yml)
 
 FlowWise 是一套独立实现的项目与任务协作平台，面向小团队提供项目看板、任务分派、审批流转、操作审计和角色权限。它有自己的产品名称、代码结构与数据模型；此仓库不包含从其他项目复制的业务源码。
 
@@ -120,7 +118,7 @@ java -jar target\flowwise-platform-modern.jar
 
 架构和角色边界详见 [docs/architecture.md](docs/architecture.md)。
 
-开发与提交规范见 [CONTRIBUTING.md](CONTRIBUTING.md)，安全问题请阅读 [SECURITY.md](SECURITY.md)。本项目尚未附带开源许可证；在许可证确定前，默认版权规则仍然适用。
+开发与提交规范见 [CONTRIBUTING.md](CONTRIBUTING.md)，安全问题请阅读 [SECURITY.md](SECURITY.md)。项目采用 MIT License，详情见 [LICENSE](LICENSE)。
 
 ## 简历描述建议
 
