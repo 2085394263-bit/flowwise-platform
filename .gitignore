@@ -1,0 +1,14 @@
+target/
+data/
+runlogs/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.classpath
+.project
+.settings/

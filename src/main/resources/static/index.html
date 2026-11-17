@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fb">
+  <title>FlowWise · 团队项目协作</title>
+  <link rel="stylesheet" href="/app.css?v=20261117-agent-follow">
+  <link rel="stylesheet" href="/auth.css">
+  <link rel="stylesheet" href="/notifications.css">
+</head>
+<body>
+  <div id="login-screen" class="login-screen" hidden>
+    <form id="login-form" class="login-card auth-panel">
+      <div class="brand-mark">F</div>
+      <p class="eyebrow">TEAM PROJECT OPERATIONS</p>
+      <h1>欢迎回到 FlowWise</h1>
+      <p class="muted">让项目、任务与审批保持在同一节奏。</p>
+      <label>账号<input name="username" autocomplete="username" required value="admin"></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" required value="admin123"></label>
+      <p id="login-error" class="error-text"></p>
+      <button class="button primary full" type="submit">登录工作台 <span>→</span></button>
+      <p class="demo-hint">演示账号：admin / admin123</p>
+      <button id="show-register" class="auth-switch" type="button">还没有账号？注册成员账号或申请项目经理</button>
+    </form>
+    <form id="register-form" class="login-card auth-panel" hidden>
+      <div class="brand-mark">F</div>
+      <p class="eyebrow">JOIN FLOWWISE</p>
+      <h1>创建协作账号</h1>
+      <p class="muted">注册后即可进入团队协作工作台。</p>
+      <label>账号<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="3–32 位字母、数字或 . _ -"></label>
+      <label>密码<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required placeholder="至少 8 位"></label>
+      <label>账号类型<select name="role" id="register-role"><option value="MEMBER">成员</option><option value="MANAGER">项目经理 / 负责人（需管理员审批）</option></select></label>
+      <p id="register-note" class="auth-note">成员注册成功后可直接登录。</p>
+      <p id="register-result" class="auth-result" aria-live="polite"></p>
+      <button class="button primary full" type="submit">提交注册 <span>→</span></button>
+      <button id="show-login" class="auth-switch" type="button">已有账号？返回登录</button>
+      <p class="demo-hint">管理员账号由现有管理员创建，不能公开自助注册。</p>
+    </form>
+  </div>
+
+  <div id="app" class="app-shell" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark small">F</span><span>FlowWise<small>PROJECT SPACE</small></span></a>
+      <div class="workspace-label">工作空间 <span class="workspace-dot"></span></div>
+      <nav class="nav-list">
+        <a class="nav-item active" href="#overview" data-view="overview"><span class="nav-icon">◫</span> 工作台</a>
+        <a class="nav-item" href="#projects" data-view="projects"><span class="nav-icon">▧</span> 项目空间</a>
+        <a class="nav-item" href="#tasks" data-view="tasks"><span class="nav-icon">☷</span> 任务列表</a>
+        <a class="nav-item" href="#approvals" data-view="approvals"><span class="nav-icon">◷</span> 审批中心 <b id="approval-badge" class="nav-badge">0</b></a>
+        <a class="nav-item" href="#" data-view="agent" aria-controls="agent-assistant-panel"><span class="nav-icon">✦</span> AI 项目助手</a>
+      </nav>
+      <div class="sidebar-bottom">
+          <div class="help-card"><span class="help-icon">✦</span><strong id="role-help-title">保持协作有序</strong><p id="role-help-copy">每个任务都有负责人和清晰的下一步。</p></div>
+        <button id="logout-button" class="user-chip"><span id="avatar" class="avatar">A</span><span><strong id="current-user">管理员</strong><small id="current-role">ADMIN</small></span><span class="logout-symbol">↗</span></button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar"><div class="breadcrumb">工作空间 <span>/</span> <strong id="page-title">工作台</strong></div><div class="top-actions"><span class="date-label" id="today"></span><span class="live-label" id="sync-label"><i></i> 自动同步</span><div class="notification-wrap"><button class="icon-button" id="notification-toggle" type="button" title="通知" aria-label="通知" aria-expanded="false" aria-controls="notification-panel">♧<i id="notification-dot" hidden></i><b id="notification-count" class="notification-count" hidden>0</b></button><section id="notification-panel" class="notification-panel" hidden aria-label="消息通知"><div class="notification-heading"><div><p class="eyebrow">INBOX</p><h2>消息通知</h2></div><button id="notification-view-approvals" type="button" class="text-button">审批中心 →</button></div><div id="notification-list" class="notification-list" aria-live="polite"></div></section></div></div></header>
+      <section class="page-heading" id="overview"><div><p class="eyebrow" id="home-eyebrow">MONDAY, PROJECT OVERVIEW</p><h1 id="home-title">把重要的事，稳步向前推进。</h1><p class="muted"><span id="home-copy">欢迎回来，</span><span id="welcome-name">管理员</span><span id="home-copy-tail">。这是团队当前的协作概况。</span></p></div><button id="new-project" class="button primary">＋ 新建项目</button></section>
+
+      <section class="metrics-grid" aria-label="项目统计">
+        <article class="metric-card"><div class="metric-top"><span id="metric-projects-label">进行中项目</span><span class="metric-icon violet">▧</span></div><strong id="metric-projects">—</strong><small><i class="trend-dot"></i><span id="metric-projects-hint">当前工作空间</span></small></article>
+        <article class="metric-card"><div class="metric-top"><span id="metric-tasks-label">任务总数</span><span class="metric-icon blue">☷</span></div><strong id="metric-tasks">—</strong><small id="metric-tasks-hint">跨项目统一追踪</small></article>
+        <article class="metric-card"><div class="metric-top"><span id="metric-approvals-label">待审批</span><span class="metric-icon amber">◷</span></div><strong id="metric-approvals">—</strong><small id="metric-approvals-hint">等待负责人处理</small></article>
+        <article class="metric-card"><div class="metric-top"><span id="metric-rate-label">整体完成率</span><span class="metric-icon green">↗</span></div><strong><span id="metric-rate">—</span><em id="metric-rate-unit">%</em></strong><small id="metric-rate-hint">按已完成任务计算</small></article>
+      </section>
+
+      <section id="admin-home-panel" class="panel role-home-panel" hidden><div class="panel-heading"><div><p class="eyebrow">ADMIN CONSOLE</p><h2>全局治理工作台</h2><p class="muted">集中处理项目变更、团队准入和任务验收。</p></div><button type="button" class="button primary" data-go-approvals>打开审批中心</button></div><div class="role-home-stats"><div><strong id="admin-project-requests">0</strong><span>项目申请</span></div><div><strong id="admin-manager-requests">0</strong><span>经理注册</span></div><div><strong id="admin-task-approvals">0</strong><span>交付验收</span></div></div></section>
+      <section id="manager-home-panel" class="panel role-home-panel" hidden><div class="panel-heading"><div><p class="eyebrow">MANAGER DESK</p><h2>项目经理工作台</h2><p class="muted">跟进自己负责的项目、分派员工任务并处理交付验收。</p></div><button type="button" class="button primary" data-go-approvals>处理交付验收</button></div><div class="role-home-stats"><div><strong id="manager-project-count">0</strong><span>负责项目</span></div><div><strong id="manager-task-count">0</strong><span>项目任务</span></div><div><strong id="manager-review-count">0</strong><span>待验收交付</span></div></div></section>
+      <section id="member-work-panel" class="panel member-work-panel" hidden><div class="panel-heading"><div><p class="eyebrow">MY WORK</p><h2>分配给我的任务</h2><p id="member-task-summary" class="muted">新分配任务会自动显示在这里。</p></div><button type="button" class="button secondary" id="member-view-all-tasks">查看任务列表</button></div><div id="member-task-list" class="member-task-list"></div></section>
+
+      <div class="content-grid">
+        <section class="panel project-panel" id="projects"><div class="panel-heading"><div><p class="eyebrow">PORTFOLIO</p><h2 id="home-projects-title">项目空间</h2></div><button class="text-button" id="view-projects">查看全部 <span>→</span></button></div><div id="project-list" class="project-list"></div></section>
+        <section class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">TEAM PULSE</p><h2>最近动态</h2></div><span class="live-label"><i></i> 实时</span></div><div id="activity-list" class="activity-list"></div></section>
+      </div>
+
+      <section id="projects-view" class="route-view" hidden>
+        <div class="route-heading"><div><p class="eyebrow">YOUR PORTFOLIO</p><h1>项目空间</h1><p class="muted">每个项目有独立的任务、进度和协作上下文。</p></div><button id="new-project-list" class="button primary">＋ 新建项目</button></div>
+        <div id="all-projects-list" class="all-projects-grid"></div>
+      </section>
+
+      <section id="project-view" class="route-view" hidden>
+        <button id="back-to-projects" class="back-link">← 返回项目空间</button>
+        <div class="project-detail-heading"><div><p class="eyebrow">PROJECT WORKSPACE</p><h1 id="detail-project-name">项目</h1><p id="detail-project-description" class="muted"></p></div><div class="task-toolbar"><button id="detail-edit-project" class="button secondary">编辑项目</button><button id="detail-delete-project" class="button secondary">申请删除</button><button id="detail-new-task" class="button primary">＋ 添加任务</button></div></div>
+        <div class="detail-metrics"><article class="detail-metric"><small>项目负责人</small><strong id="detail-project-owner">—</strong></article><article class="detail-metric"><small>项目状态</small><strong id="detail-project-status">—</strong></article><article class="detail-metric"><small>任务完成度</small><strong id="detail-project-progress">0%</strong></article><article class="detail-metric"><small>任务总数</small><strong id="detail-project-count">0</strong></article></div>
+        <section class="panel detail-task-panel"><div class="panel-heading"><div><p class="eyebrow">PROJECT EXECUTION</p><h2>本项目任务</h2></div><span id="detail-task-summary" class="muted small-copy"></span></div><div class="table-wrap"><table><thead><tr><th>任务</th><th>负责人</th><th>优先级</th><th>状态</th><th>截止日期</th><th>操作</th></tr></thead><tbody id="detail-task-rows"></tbody></table></div></section>
+      </section>
+
+      <section class="panel tasks-panel route-view" id="tasks" hidden><div class="panel-heading"><div><p class="eyebrow">EXECUTION</p><h2>任务列表</h2></div><div class="task-toolbar"><select id="task-filter" aria-label="筛选任务"><option value="ALL">全部状态</option><option value="TODO">待开始</option><option value="IN_PROGRESS">进行中</option><option value="REVIEW">待审批</option><option value="DONE">已完成</option></select><button class="button secondary" id="new-task">＋ 新建任务</button></div></div><div class="table-wrap"><table><thead><tr><th>任务</th><th>所属项目</th><th>负责人</th><th>优先级</th><th>状态</th><th>截止日期</th><th>操作</th></tr></thead><tbody id="task-rows"></tbody></table></div></section>
+      <section class="panel approvals-panel route-view" id="approvals" hidden><div class="panel-heading"><div><p class="eyebrow">WORKFLOW</p><h2>待我审批</h2></div><span class="muted small-copy">审批通过后任务将自动完成</span></div><div id="approval-list" class="approval-list"></div><div id="project-requests-panel" hidden><div class="panel-heading approval-section-heading"><div><p class="eyebrow">PROJECT GOVERNANCE</p><h2>项目变更审批</h2></div><span class="muted small-copy">新建、修改和删除项目均需管理员审批</span></div><div id="project-approval-list" class="approval-list"></div><div class="panel-heading approval-section-heading"><div><p class="eyebrow">TEAM ACCESS</p><h2>项目经理注册申请</h2></div><button class="button secondary" id="admin-create-account">＋ 管理员创建账号</button></div><div id="manager-registration-list" class="approval-list"></div></div></section>
+      <footer class="footer"><span>FlowWise <i>•</i> 团队项目协作平台</span><span>让协作清晰，让交付可见。</span></footer>
+    </main>
+    <aside id="agent-assistant" class="agent-assistant" aria-label="AI 项目助手">
+      <button id="agent-launcher" class="agent-launcher" type="button" aria-expanded="false" aria-controls="agent-assistant-panel"><span aria-hidden="true">✦</span><span>AI 助手</span></button>
+      <section id="agent-assistant-panel" class="agent-assistant-panel" hidden aria-label="AI 项目助手对话">
+        <div class="agent-assistant-heading"><div><p class="eyebrow">SPRING AI · TOOL CALLING</p><h2>AI 项目助手</h2><p>跟随工作台，可询问你有权限查看的项目和任务。</p></div><button id="agent-close" class="close-button" type="button" aria-label="关闭 AI 助手">×</button></div>
+        <div id="agent-transcript" class="agent-transcript" aria-live="polite"><p class="agent-empty">例如：我有哪些待开始任务？哪个任务快到期？</p></div>
+        <form id="agent-form" class="agent-form"><label class="sr-only" for="agent-message">向 AI 项目助手提问</label><textarea id="agent-message" maxlength="2000" rows="3" placeholder="输入项目或任务问题…" required></textarea><button class="button primary" type="submit">发送</button></form>
+        <p class="muted small-copy">助手只读当前账号可见的数据；任务提交、修改和审批仍需通过工作台操作。</p>
+      </section>
+    </aside>
+  </div>
+
+  <dialog id="project-dialog" class="modal"><form id="project-form" class="modal-card"><div class="modal-heading"><div><p class="eyebrow">NEW WORKSPACE</p><h2>创建项目</h2></div><button type="button" class="close-button" data-close="project-dialog">×</button></div><label>项目名称<input name="name" maxlength="100" placeholder="例如：客户门户升级" required></label><label>项目简介<textarea name="description" maxlength="500" rows="3" placeholder="用一句话描述目标和范围"></textarea></label><div class="modal-actions"><button type="button" class="button secondary" data-close="project-dialog">取消</button><button class="button primary" type="submit">创建项目</button></div></form></dialog>
+  <dialog id="project-edit-dialog" class="modal"><form id="project-edit-form" class="modal-card"><div class="modal-heading"><div><p class="eyebrow">PROJECT CHANGE</p><h2>申请修改项目</h2></div><button type="button" class="close-button" data-close="project-edit-dialog">×</button></div><label>项目名称<input name="name" maxlength="100" required></label><label>项目简介<textarea name="description" maxlength="500" rows="3"></textarea></label><div class="modal-actions"><button type="button" class="button secondary" data-close="project-edit-dialog">取消</button><button class="button primary" type="submit">提交管理员审批</button></div></form></dialog>
+    <dialog id="task-dialog" class="modal"><form id="task-form" class="modal-card"><div class="modal-heading"><div><p class="eyebrow">ACTION ITEM</p><h2 id="task-dialog-title">创建任务</h2></div><button type="button" class="close-button" data-close="task-dialog">×</button></div><label>任务名称<input name="title" maxlength="160" placeholder="描述一个可交付的行动项" required></label><label>所属项目<select name="projectId" id="task-project" required></select></label><div class="form-row"><label>负责人<select name="assignee" id="task-assignee"><option value="">未分配</option></select></label><label>优先级<select name="priority"><option value="NORMAL">普通</option><option value="HIGH">高</option><option value="LOW">低</option></select></label></div><label>截止日期<input name="dueDate" type="date"></label><div class="modal-actions"><button type="button" class="button secondary" data-close="task-dialog">取消</button><button class="button primary" id="task-submit" type="submit">创建任务</button></div></form></dialog>
+    <dialog id="delivery-dialog" class="modal"><form id="delivery-form" class="modal-card"><div class="modal-heading"><div><p class="eyebrow">TASK HANDOFF</p><h2>提交任务交付</h2></div><button type="button" class="close-button" data-close="delivery-dialog">×</button></div><input type="hidden" name="taskId"><p id="delivery-task-title" class="muted"></p><label>交付说明<textarea name="note" maxlength="2000" rows="4" placeholder="说明完成内容、验证方式或注意事项"></textarea></label><label>交付链接<input name="url" type="url" maxlength="500" placeholder="https://…"></label><p class="auth-note">交付说明和链接至少填写一项；提交后由项目负责人验收。</p><div class="modal-actions"><button type="button" class="button secondary" data-close="delivery-dialog">取消</button><button class="button primary" type="submit">提交验收</button></div></form></dialog>
+    <dialog id="admin-account-dialog" class="modal"><form id="admin-account-form" class="modal-card"><div class="modal-heading"><div><p class="eyebrow">TEAM ACCESS</p><h2>管理员创建账号</h2></div><button type="button" class="close-button" data-close="admin-account-dialog">×</button></div><label>账号<input name="username" minlength="3" maxlength="32" required></label><label>初始密码<input name="password" type="password" minlength="8" maxlength="72" required></label><label>角色<select name="role"><option value="MEMBER">成员</option><option value="MANAGER">项目经理 / 负责人</option><option value="ADMIN">管理员</option></select></label><p class="auth-note">新账号会立即启用。请安全地把初始密码交给对应成员。</p><div class="modal-actions"><button type="button" class="button secondary" data-close="admin-account-dialog">取消</button><button class="button primary" type="submit">创建账号</button></div></form></dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/app.js?v=20261117-agent-follow"></script>
+</body>
+</html>
